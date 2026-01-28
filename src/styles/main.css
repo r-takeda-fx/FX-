@@ -292,6 +292,67 @@ body {
   border-left: 4px solid #dc2626;
 }
 
+.risk-expert {
+  border-left: 4px solid #7c3aed;
+  background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+}
+
+.risk-trending {
+  border-left: 4px solid #f97316;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+}
+
+/* 更新情報 */
+.stocks-update-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.update-time {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.update-btn {
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.update-btn:hover {
+  background: var(--primary-hover);
+}
+
+.update-btn:disabled {
+  background: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.auto-update-badge {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  background: #10b981;
+  color: white;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+.stock-tag-expert {
+  background: #7c3aed20;
+  color: #7c3aed;
+}
+
 .stocks-grid-inner {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
