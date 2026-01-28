@@ -256,9 +256,40 @@ body {
 .stocks-category-title {
   font-size: 1.1rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.risk-badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.risk-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: var(--bg-color);
+  border-radius: var(--radius);
+}
+
+.risk-low {
+  border-left: 4px solid #16a34a;
+}
+
+.risk-medium {
+  border-left: 4px solid #f59e0b;
+}
+
+.risk-high {
+  border-left: 4px solid #dc2626;
 }
 
 .stocks-grid-inner {

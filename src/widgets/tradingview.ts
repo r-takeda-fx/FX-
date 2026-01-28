@@ -17,10 +17,14 @@ export function initTradingViewWidgets(): void {
   // ティッカー初期化
   initTicker();
 
-  // チャート初期化
-  CHARTS.forEach((chart) => {
-    initAdvancedChart(chart.containerId, chart.symbol);
-  });
+  // チャート初期化（少し遅延させて確実に読み込む）
+  setTimeout(() => {
+    CHARTS.forEach((chart, index) => {
+      setTimeout(() => {
+        initSymbolOverview(chart.containerId, chart.symbol);
+      }, index * 100);
+    });
+  }, 500);
 }
 
 /**
@@ -60,43 +64,62 @@ function initTicker(): void {
 }
 
 /**
- * 高度なチャートウィジェットを初期化（詳細・広範囲表示対応）
+ * シンボルオーバービューウィジェットを初期化
  */
-function initAdvancedChart(containerId: string, symbol: string): void {
+function initSymbolOverview(containerId: string, symbol: string): void {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // 高度なチャートウィジェットを使用
+  // ユニークなIDを生成
+  const widgetId = `${containerId}-widget-${Date.now()}`;
+
   container.innerHTML = `
     <div class="tradingview-widget-container" style="height: 100%; width: 100%;">
-      <div id="${containerId}-widget" style="height: 100%; width: 100%;"></div>
+      <div class="tradingview-widget-container__widget" id="${widgetId}" style="height: 100%; width: 100%;"></div>
     </div>
   `;
 
   const script = document.createElement('script');
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
   script.async = true;
   script.innerHTML = JSON.stringify({
-    autosize: true,
-    symbol: symbol,
-    interval: 'D',
-    timezone: 'Asia/Tokyo',
-    theme: 'light',
-    style: '1',
+    symbols: [[symbol]],
+    chartOnly: false,
+    width: '100%',
+    height: '100%',
     locale: 'ja',
-    allow_symbol_change: true,
-    calendar: false,
-    support_host: 'https://www.tradingview.com',
-    hide_side_toolbar: false,
-    withdateranges: true,
-    range: '3M',
-    details: true,
-    hotlist: false,
-    show_popup_button: true,
-    popup_width: '1000',
-    popup_height: '650',
-    container_id: `${containerId}-widget`,
+    colorTheme: 'light',
+    autosize: true,
+    showVolume: true,
+    showMA: true,
+    hideDateRanges: false,
+    hideMarketStatus: false,
+    hideSymbolLogo: false,
+    scalePosition: 'right',
+    scaleMode: 'Normal',
+    fontFamily: '-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif',
+    fontSize: '10',
+    noTimeScale: false,
+    valuesTracking: '1',
+    changeMode: 'price-and-percent',
+    chartType: 'area',
+    maLineColor: '#2962FF',
+    maLineWidth: 1,
+    maLength: 9,
+    lineWidth: 2,
+    lineType: 0,
+    dateRanges: [
+      '1d|1',
+      '1m|30',
+      '3m|60',
+      '12m|1D',
+      '60m|1W',
+      'all|1M'
+    ]
   });
 
-  container.querySelector('.tradingview-widget-container')?.appendChild(script);
+  const widgetContainer = container.querySelector('.tradingview-widget-container');
+  if (widgetContainer) {
+    widgetContainer.appendChild(script);
+  }
 }
