@@ -24,22 +24,19 @@
       <!-- 市場チャート -->
       <section class="section charts-section">
         <h2>📊 主要市場</h2>
+        <p class="section-description">チャートは拡大・縮小、期間変更が可能です。右上の拡大ボタンで詳細表示できます。</p>
         <div class="charts-grid">
           <div class="chart-card">
-            <h3>日経平均</h3>
-            <div id="chart-nikkei" class="chart-container"></div>
+            <div id="chart-nikkei" class="chart-container-large"></div>
           </div>
           <div class="chart-card">
-            <h3>S&P 500</h3>
-            <div id="chart-sp500" class="chart-container"></div>
+            <div id="chart-sp500" class="chart-container-large"></div>
           </div>
           <div class="chart-card">
-            <h3>NASDAQ</h3>
-            <div id="chart-nasdaq" class="chart-container"></div>
+            <div id="chart-nasdaq" class="chart-container-large"></div>
           </div>
           <div class="chart-card">
-            <h3>USD/JPY</h3>
-            <div id="chart-nikkei-futures" class="chart-container"></div>
+            <div id="chart-usdjpy" class="chart-container-large"></div>
           </div>
         </div>
       </section>
@@ -61,9 +58,10 @@
 
       <!-- おすすめ銘柄セクション -->
       <section class="section stocks-section">
-        <h2>💡 初心者向けおすすめ銘柄</h2>
+        <h2>💡 初心者向けおすすめ銘柄（日本株・米国株・ETF）</h2>
         <div class="disclaimer">
-          ⚠️ 投資は自己責任です。以下は教育目的の参考情報であり、投資助言ではありません。
+          ⚠️ 投資は自己責任です。以下は教育目的の参考情報であり、投資助言ではありません。<br>
+          米国株は為替リスクがあります。また、配当への二重課税に注意してください。
         </div>
         <div id="stocks-container" class="stocks-grid"></div>
       </section>

@@ -7,7 +7,7 @@ const CHARTS = [
   { containerId: 'chart-nikkei', symbol: 'OANDA:JP225USD', name: '日経平均' },
   { containerId: 'chart-sp500', symbol: 'OANDA:SPX500USD', name: 'S&P 500' },
   { containerId: 'chart-nasdaq', symbol: 'OANDA:NAS100USD', name: 'NASDAQ' },
-  { containerId: 'chart-nikkei-futures', symbol: 'FX:USDJPY', name: 'USD/JPY' },
+  { containerId: 'chart-usdjpy', symbol: 'FX:USDJPY', name: 'USD/JPY' },
 ];
 
 /**
@@ -19,7 +19,7 @@ export function initTradingViewWidgets(): void {
 
   // チャート初期化
   CHARTS.forEach((chart) => {
-    initChart(chart.containerId, chart.symbol);
+    initAdvancedChart(chart.containerId, chart.symbol);
   });
 }
 
@@ -30,24 +30,22 @@ function initTicker(): void {
   const container = document.getElementById('tradingview-ticker');
   if (!container) return;
 
-  // ティッカーウィジェットのHTMLを挿入
   container.innerHTML = `
     <div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
     </div>
   `;
 
-  // TradingViewティッカーテープウィジェットのスクリプトを動的に追加
   const script = document.createElement('script');
   script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
   script.async = true;
   script.innerHTML = JSON.stringify({
     symbols: [
-      { proName: 'TVC:NI225', title: '日経平均' },
-      { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500' },
-      { proName: 'NASDAQ:NDX', title: 'NASDAQ' },
+      { proName: 'OANDA:JP225USD', title: '日経平均' },
+      { proName: 'OANDA:SPX500USD', title: 'S&P 500' },
+      { proName: 'OANDA:NAS100USD', title: 'NASDAQ' },
       { proName: 'FX:USDJPY', title: 'USD/JPY' },
-      { proName: 'CME_MINI:NKD1!', title: '日経先物' },
+      { proName: 'FX:EURUSD', title: 'EUR/USD' },
       { proName: 'TVC:GOLD', title: 'ゴールド' },
       { proName: 'BITSTAMP:BTCUSD', title: 'ビットコイン' },
     ],
@@ -62,32 +60,42 @@ function initTicker(): void {
 }
 
 /**
- * チャートウィジェットを初期化（ミニチャートウィジェット使用）
+ * 高度なチャートウィジェットを初期化（詳細・広範囲表示対応）
  */
-function initChart(containerId: string, symbol: string): void {
+function initAdvancedChart(containerId: string, symbol: string): void {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // ミニチャートウィジェットを使用
+  // 高度なチャートウィジェットを使用
   container.innerHTML = `
     <div class="tradingview-widget-container" style="height: 100%; width: 100%;">
-      <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
+      <div id="${containerId}-widget" style="height: 100%; width: 100%;"></div>
     </div>
   `;
 
   const script = document.createElement('script');
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
   script.async = true;
   script.innerHTML = JSON.stringify({
-    symbol: symbol,
-    width: '100%',
-    height: '100%',
-    locale: 'ja',
-    dateRange: '1M',
-    colorTheme: 'light',
-    isTransparent: false,
     autosize: true,
-    largeChartUrl: '',
+    symbol: symbol,
+    interval: 'D',
+    timezone: 'Asia/Tokyo',
+    theme: 'light',
+    style: '1',
+    locale: 'ja',
+    allow_symbol_change: true,
+    calendar: false,
+    support_host: 'https://www.tradingview.com',
+    hide_side_toolbar: false,
+    withdateranges: true,
+    range: '3M',
+    details: true,
+    hotlist: false,
+    show_popup_button: true,
+    popup_width: '1000',
+    popup_height: '650',
+    container_id: `${containerId}-widget`,
   });
 
   container.querySelector('.tradingview-widget-container')?.appendChild(script);
