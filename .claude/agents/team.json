@@ -1,0 +1,44 @@
+{
+  "description": "株式投資アプリ開発のサブエージェント構成",
+  "agents": [
+    {
+      "id": "analyst",
+      "role": "Analyst",
+      "subagent_type": "Explore",
+      "responsibilities": ["コードベース調査", "API仕様調査", "既存実装の分析"],
+      "when_to_use": "yfinance/NewsAPI等のAPIの使い方を調査する時、既存コードの理解が必要な時"
+    },
+    {
+      "id": "planner",
+      "role": "Planner",
+      "subagent_type": "Plan",
+      "responsibilities": ["実装計画策定", "タスク分解", "アーキテクチャ設計"],
+      "when_to_use": "新機能の設計時、複雑なタスクの計画時"
+    },
+    {
+      "id": "implementer",
+      "role": "Implementer",
+      "subagent_type": "general-purpose",
+      "responsibilities": ["コード実装", "UI作成", "API連携実装"],
+      "when_to_use": "実際のコード変更時、複数の独立した実装作業時"
+    },
+    {
+      "id": "reviewer",
+      "role": "Reviewer",
+      "subagent_type": "general-purpose",
+      "responsibilities": ["コードレビュー", "品質チェック", "セキュリティ確認"],
+      "when_to_use": "実装完了後のレビュー、プルリクエスト前"
+    }
+  ],
+  "parallel_execution_rules": {
+    "always_parallel": [
+      "複数API（yfinance, NewsAPI）からのデータ取得",
+      "独立したUIコンポーネントの実装",
+      "複数ファイルの同時編集"
+    ],
+    "sequential": [
+      "API取得→データ表示の依存タスク",
+      "設計→実装の依存タスク"
+    ]
+  }
+}

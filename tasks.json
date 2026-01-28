@@ -1,0 +1,110 @@
+{
+  "project": "FX-",
+  "version": "1.0.0",
+  "updated": "2026-01-28T00:00:00Z",
+  "repository": "https://github.com/r-takeda-fx/FX-",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Python仮想環境のセットアップ",
+      "description": "venvを作成し、必要なパッケージをインストールする",
+      "status": "pending",
+      "type": "small",
+      "dependencies": [],
+      "acceptance_criteria": [
+        "venvフォルダが作成されている",
+        "requirements.txtのパッケージがインストールされている"
+      ],
+      "subtasks": [],
+      "notes": "手動でpython -m venv venvを実行する必要あり",
+      "created_at": "2026-01-28T00:00:00Z",
+      "completed_at": null
+    },
+    {
+      "id": 2,
+      "title": "Streamlit基本構造の作成",
+      "description": "app.pyを作成し、基本的なページレイアウトを構築する",
+      "status": "pending",
+      "type": "small",
+      "dependencies": [1],
+      "acceptance_criteria": [
+        "app.pyが作成されている",
+        "streamlit runで起動できる",
+        "基本的なレイアウト（サイドバー、メインエリア）が表示される"
+      ],
+      "subtasks": [],
+      "notes": "",
+      "created_at": "2026-01-28T00:00:00Z",
+      "completed_at": null
+    },
+    {
+      "id": 3,
+      "title": "市場データ取得機能の実装",
+      "description": "yfinanceを使って日経平均、米国市場、先物のデータを取得する",
+      "status": "pending",
+      "type": "medium",
+      "dependencies": [2],
+      "acceptance_criteria": [
+        "日経平均のデータが取得できる",
+        "S&P500、NASDAQのデータが取得できる",
+        "先物データが取得できる",
+        "データがダッシュボードに表示される"
+      ],
+      "subtasks": [],
+      "notes": "",
+      "created_at": "2026-01-28T00:00:00Z",
+      "completed_at": null
+    },
+    {
+      "id": 4,
+      "title": "ニュース取得機能の実装",
+      "description": "NewsAPI/RSSを使ってニュースを取得し、カテゴリ分類する",
+      "status": "pending",
+      "type": "medium",
+      "dependencies": [2],
+      "acceptance_criteria": [
+        "ニュースが取得できる",
+        "カテゴリ（FRB/日銀、インフレ、雇用統計、地政学、決算）で分類できる",
+        "ニュースセクションに表示される"
+      ],
+      "subtasks": [],
+      "notes": "",
+      "created_at": "2026-01-28T00:00:00Z",
+      "completed_at": null
+    },
+    {
+      "id": 5,
+      "title": "AI要約機能の実装",
+      "description": "Claude APIを使って市場状況の「ひとこと解説」を生成する",
+      "status": "pending",
+      "type": "medium",
+      "dependencies": [3, 4],
+      "acceptance_criteria": [
+        "Claude APIと連携できる",
+        "市場状況の要約が生成される",
+        "要約がダッシュボードに表示される"
+      ],
+      "subtasks": [],
+      "notes": "",
+      "created_at": "2026-01-28T00:00:00Z",
+      "completed_at": null
+    },
+    {
+      "id": 6,
+      "title": "おすすめ銘柄機能の実装",
+      "description": "初心者向けの銘柄を提案する機能を実装する",
+      "status": "pending",
+      "type": "medium",
+      "dependencies": [5],
+      "acceptance_criteria": [
+        "銘柄選定ロジックが実装されている",
+        "おすすめ銘柄が表示される",
+        "免責表示が含まれている"
+      ],
+      "subtasks": [],
+      "notes": "",
+      "created_at": "2026-01-28T00:00:00Z",
+      "completed_at": null
+    }
+  ]
+}

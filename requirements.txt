@@ -1,0 +1,27 @@
+# Python dependencies for Stock Investment App (FX-)
+
+# Web Framework
+streamlit>=1.30.0
+
+# Stock Data
+yfinance>=0.2.36
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization
+plotly>=5.18.0
+
+# HTTP Requests (for News API)
+requests>=2.31.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# AI Integration (choose one)
+anthropic>=0.18.0  # Claude API
+# openai>=1.0.0    # OpenAI API (alternative)
+
+# News/RSS
+feedparser>=6.0.0  # RSS feed parsing

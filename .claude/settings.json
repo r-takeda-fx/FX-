@@ -1,0 +1,29 @@
+{
+  "privacy": {
+    "telemetry": false
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash(rm -rf *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Dangerous recursive delete blocked.' && exit 1"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write(*.py)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -m black $file 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}
