@@ -1,13 +1,8 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-ENV/
-env/
-.venv/
+# Dependencies
+node_modules/
+
+# Build output
+dist/
 
 # Environment variables
 .env
@@ -25,17 +20,15 @@ env/
 .DS_Store
 Thumbs.db
 
-# Streamlit
-.streamlit/secrets.toml
-
 # Logs
 *.log
 logs/
+npm-debug.log*
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
 
-# Output results (optional - uncomment if you don't want to track results)
-# output/*/results/
+# Vite
+*.local

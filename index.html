@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>株式投資ダッシュボード</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div class="app">
+    <!-- ヘッダー -->
+    <header class="header">
+      <h1>📈 株式投資ダッシュボード</h1>
+      <p class="subtitle">初心者のための市場情報まとめ</p>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main">
+      <!-- マーケットティッカー -->
+      <section class="section ticker-section">
+        <div id="tradingview-ticker"></div>
+      </section>
+
+      <!-- 市場チャート -->
+      <section class="section charts-section">
+        <h2>📊 主要市場</h2>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>日経平均</h3>
+            <div id="chart-nikkei" class="chart-container"></div>
+          </div>
+          <div class="chart-card">
+            <h3>S&P 500</h3>
+            <div id="chart-sp500" class="chart-container"></div>
+          </div>
+          <div class="chart-card">
+            <h3>NASDAQ</h3>
+            <div id="chart-nasdaq" class="chart-container"></div>
+          </div>
+          <div class="chart-card">
+            <h3>日経先物</h3>
+            <div id="chart-nikkei-futures" class="chart-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ニュースセクション -->
+      <section class="section news-section">
+        <h2>📰 マーケットニュース</h2>
+        <div class="news-filters">
+          <button class="filter-btn active" data-category="all">すべて</button>
+          <button class="filter-btn" data-category="central-bank">中央銀行</button>
+          <button class="filter-btn" data-category="economic">経済指標</button>
+          <button class="filter-btn" data-category="geopolitical">地政学</button>
+          <button class="filter-btn" data-category="earnings">決算</button>
+        </div>
+        <div id="news-container" class="news-container">
+          <div class="loading">ニュースを読み込み中...</div>
+        </div>
+      </section>
+
+      <!-- おすすめ銘柄セクション -->
+      <section class="section stocks-section">
+        <h2>💡 初心者向けおすすめ銘柄</h2>
+        <div class="disclaimer">
+          ⚠️ 投資は自己責任です。以下は教育目的の参考情報であり、投資助言ではありません。
+        </div>
+        <div id="stocks-container" class="stocks-grid"></div>
+      </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer">
+      <p>© 2026 株式投資ダッシュボード | データ: TradingView, RSS</p>
+      <p class="disclaimer-footer">当サイトの情報は投資助言ではありません。投資判断は自己責任でお願いします。</p>
+    </footer>
+  </div>
+
+  <!-- TradingView Widget Script -->
+  <script src="https://s3.tradingview.com/tv.js"></script>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
