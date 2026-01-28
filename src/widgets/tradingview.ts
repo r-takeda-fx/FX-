@@ -2,12 +2,12 @@
 // TradingView ウィジェット
 // ========================================
 
-// チャート設定
+// チャート設定（無料で使えるCFDシンボルを使用）
 const CHARTS = [
-  { containerId: 'chart-nikkei', symbol: 'TVC:NI225', name: '日経平均' },
-  { containerId: 'chart-sp500', symbol: 'FOREXCOM:SPXUSD', name: 'S&P 500' },
-  { containerId: 'chart-nasdaq', symbol: 'NASDAQ:NDX', name: 'NASDAQ' },
-  { containerId: 'chart-nikkei-futures', symbol: 'CME_MINI:NKD1!', name: '日経先物' },
+  { containerId: 'chart-nikkei', symbol: 'OANDA:JP225USD', name: '日経平均' },
+  { containerId: 'chart-sp500', symbol: 'OANDA:SPX500USD', name: 'S&P 500' },
+  { containerId: 'chart-nasdaq', symbol: 'OANDA:NAS100USD', name: 'NASDAQ' },
+  { containerId: 'chart-nikkei-futures', symbol: 'FX:USDJPY', name: 'USD/JPY' },
 ];
 
 /**
