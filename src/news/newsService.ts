@@ -1,9 +1,12 @@
 // ========================================
-// ニュースサービス（日本語翻訳対応）
+// ニュースサービス（日本語翻訳対応・株価影響度分析）
 // ========================================
 
 // ニュースカテゴリ
 export type NewsCategory = 'central-bank' | 'economic' | 'geopolitical' | 'earnings' | 'all';
+
+// 株価影響度レベル
+export type ImpactLevel = 'critical' | 'high' | 'medium' | 'low';
 
 // ニュースアイテムの型
 export interface NewsItem {
@@ -13,6 +16,9 @@ export interface NewsItem {
   pubDate: string;
   category: NewsCategory;
   source: string;
+  impactScore: number;
+  impactLevel: ImpactLevel;
+  impactReason: string;
 }
 
 // RSSフィード設定
@@ -46,6 +52,62 @@ const CATEGORY_KEYWORDS: Record<NewsCategory, string[]> = {
   'all': [],
 };
 
+// 株価影響度キーワード（スコア付き）
+interface ImpactKeyword {
+  keyword: string;
+  score: number;
+  reason: string;
+}
+
+const IMPACT_KEYWORDS: ImpactKeyword[] = [
+  // 最重要（金融政策関連）- スコア: 100
+  { keyword: '利上げ', score: 100, reason: '金利上昇は株価に大きな影響' },
+  { keyword: '利下げ', score: 100, reason: '金利低下は株価にプラス' },
+  { keyword: 'rate hike', score: 100, reason: '金利上昇は株価に大きな影響' },
+  { keyword: 'rate cut', score: 100, reason: '金利低下は株価にプラス' },
+  { keyword: 'FOMC', score: 95, reason: 'FRBの金融政策決定会合' },
+  { keyword: '金融政策決定会合', score: 95, reason: '日銀の政策決定' },
+  { keyword: 'quantitative', score: 90, reason: '量的緩和/引締めは市場に大影響' },
+  { keyword: '量的緩和', score: 90, reason: '金融緩和は株価にプラス' },
+
+  // 重要（経済指標関連）- スコア: 70-85
+  { keyword: '雇用統計', score: 85, reason: '米国経済の重要指標' },
+  { keyword: 'employment report', score: 85, reason: '米国経済の重要指標' },
+  { keyword: 'NFP', score: 85, reason: '非農業部門雇用者数' },
+  { keyword: 'CPI', score: 80, reason: 'インフレ指標は金融政策に影響' },
+  { keyword: '消費者物価', score: 80, reason: 'インフレ動向' },
+  { keyword: 'GDP', score: 75, reason: '経済成長率' },
+  { keyword: 'PMI', score: 70, reason: '景況感指数' },
+
+  // 重要（地政学リスク）- スコア: 60-80
+  { keyword: '戦争', score: 80, reason: '地政学リスク' },
+  { keyword: 'war', score: 80, reason: '地政学リスク' },
+  { keyword: '制裁', score: 75, reason: '経済制裁は市場に影響' },
+  { keyword: 'sanction', score: 75, reason: '経済制裁' },
+  { keyword: '関税', score: 70, reason: '貿易摩擦' },
+  { keyword: 'tariff', score: 70, reason: '貿易摩擦' },
+  { keyword: '緊張', score: 60, reason: '地政学的緊張' },
+  { keyword: 'tension', score: 60, reason: '地政学的緊張' },
+
+  // 中程度（決算・業績）- スコア: 50-70
+  { keyword: '過去最高', score: 70, reason: '好業績' },
+  { keyword: 'record high', score: 70, reason: '過去最高' },
+  { keyword: '上方修正', score: 65, reason: '業績見通し改善' },
+  { keyword: '下方修正', score: 65, reason: '業績見通し悪化' },
+  { keyword: '決算', score: 50, reason: '企業業績発表' },
+  { keyword: 'earnings', score: 50, reason: '決算発表' },
+
+  // 市場動向 - スコア: 40-60
+  { keyword: '急騰', score: 60, reason: '株価急上昇' },
+  { keyword: '急落', score: 60, reason: '株価急落' },
+  { keyword: 'surge', score: 60, reason: '急騰' },
+  { keyword: 'plunge', score: 60, reason: '急落' },
+  { keyword: 'crash', score: 70, reason: '暴落' },
+  { keyword: '暴落', score: 70, reason: '市場暴落' },
+  { keyword: '最高値', score: 55, reason: '過去最高値更新' },
+  { keyword: 'all-time high', score: 55, reason: '過去最高値' },
+];
+
 // カテゴリ表示名
 const CATEGORY_NAMES: Record<NewsCategory, string> = {
   'central-bank': '中央銀行',
@@ -53,6 +115,14 @@ const CATEGORY_NAMES: Record<NewsCategory, string> = {
   'geopolitical': '地政学',
   'earnings': '決算',
   'all': 'すべて',
+};
+
+// 影響度レベル表示名
+const IMPACT_LEVEL_NAMES: Record<ImpactLevel, string> = {
+  'critical': '最重要',
+  'high': '重要',
+  'medium': '注目',
+  'low': '一般',
 };
 
 // 翻訳キャッシュ
@@ -110,9 +180,16 @@ async function fetchAllNews(): Promise<void> {
     });
 
     if (allNews.length > 0) {
-      // 日付でソート（新しい順）
-      allNews.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-      displayNews(allNews.slice(0, 20));
+      // 影響度スコアでソート（高い順）、同スコアなら日付順
+      allNews.sort((a, b) => {
+        if (b.impactScore !== a.impactScore) {
+          return b.impactScore - a.impactScore;
+        }
+        return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
+      });
+      // 中程度以上の影響度のニュースのみ表示（low以外）
+      const highImpactNews = allNews.filter(n => n.impactLevel !== 'low');
+      displayNews(highImpactNews.length > 0 ? highImpactNews.slice(0, 15) : allNews.slice(0, 10));
     } else {
       // RSSが取得できない場合はサンプルを表示
       displayNews(sampleNews);
@@ -150,6 +227,9 @@ async function fetchRssFeed(
         titleJa = await translateToJapanese(item.title);
       }
 
+      // 影響度を計算
+      const impact = calculateImpact(item.title + ' ' + titleJa);
+
       items.push({
         title: item.title,
         titleJa: titleJa,
@@ -157,6 +237,9 @@ async function fetchRssFeed(
         pubDate: item.pubDate,
         category: detectCategory(item.title + ' ' + titleJa, defaultCategory),
         source: source,
+        impactScore: impact.score,
+        impactLevel: impact.level,
+        impactReason: impact.reason,
       });
     }
 
@@ -217,6 +300,42 @@ function detectCategory(title: string, defaultCategory: NewsCategory): NewsCateg
 }
 
 /**
+ * 株価影響度を計算
+ */
+function calculateImpact(title: string): { score: number; level: ImpactLevel; reason: string } {
+  const lowerTitle = title.toLowerCase();
+  let totalScore = 0;
+  const reasons: string[] = [];
+
+  for (const { keyword, score, reason } of IMPACT_KEYWORDS) {
+    if (lowerTitle.includes(keyword.toLowerCase())) {
+      totalScore += score;
+      if (!reasons.includes(reason)) {
+        reasons.push(reason);
+      }
+    }
+  }
+
+  // 影響度レベルを決定
+  let level: ImpactLevel;
+  if (totalScore >= 90) {
+    level = 'critical';
+  } else if (totalScore >= 60) {
+    level = 'high';
+  } else if (totalScore >= 30) {
+    level = 'medium';
+  } else {
+    level = 'low';
+  }
+
+  return {
+    score: totalScore,
+    level,
+    reason: reasons.slice(0, 2).join('、') || '一般ニュース',
+  };
+}
+
+/**
  * ニュースを表示
  */
 function displayNews(news: NewsItem[]): void {
@@ -229,11 +348,15 @@ function displayNews(news: NewsItem[]): void {
   }
 
   container.innerHTML = news.map((item) => `
-    <article class="news-item" data-category="${item.category}">
+    <article class="news-item" data-category="${item.category}" data-impact="${item.impactLevel}">
       <a href="${item.link}" target="_blank" rel="noopener noreferrer">
-        <span class="news-category ${item.category}">${CATEGORY_NAMES[item.category]}</span>
+        <div class="news-badges">
+          <span class="news-category ${item.category}">${CATEGORY_NAMES[item.category]}</span>
+          <span class="news-impact impact-${item.impactLevel}">${IMPACT_LEVEL_NAMES[item.impactLevel]}</span>
+        </div>
         <h3 class="news-title">${escapeHtml(item.titleJa)}</h3>
         ${item.title !== item.titleJa ? `<p class="news-original">${escapeHtml(item.title)}</p>` : ''}
+        <p class="news-impact-reason">📊 ${escapeHtml(item.impactReason)}</p>
         <p class="news-meta">${item.source} | ${formatDate(item.pubDate)}</p>
       </a>
     </article>
@@ -261,72 +384,63 @@ function filterNews(category: NewsCategory): void {
  */
 function getSampleNews(): NewsItem[] {
   const now = new Date().toISOString();
-  return [
+  const sampleData = [
     {
-      title: 'Federal Reserve keeps interest rates unchanged',
-      titleJa: 'FRB、金利据え置きを決定 - インフレ動向を注視',
-      link: '#',
-      pubDate: now,
-      category: 'central-bank',
-      source: 'サンプル',
+      title: 'FOMC announces surprise rate hike of 0.5%',
+      titleJa: 'FOMC、0.5%の利上げを発表 - 市場に衝撃',
+      category: 'central-bank' as NewsCategory,
     },
     {
-      title: 'Bank of Japan maintains monetary policy',
-      titleJa: '日銀、金融政策決定会合で現状維持',
-      link: '#',
-      pubDate: now,
-      category: 'central-bank',
-      source: 'サンプル',
+      title: 'Bank of Japan ends negative interest rate policy',
+      titleJa: '日銀、マイナス金利政策を終了 - 金融政策決定会合で決定',
+      category: 'central-bank' as NewsCategory,
     },
     {
-      title: 'US employment data exceeds expectations',
-      titleJa: '米雇用統計、予想を上回る強さ',
-      link: '#',
-      pubDate: now,
-      category: 'economic',
-      source: 'サンプル',
+      title: 'US employment report shows strong job growth',
+      titleJa: '米雇用統計、予想を大幅に上回る - FRBの利上げ継続観測強まる',
+      category: 'economic' as NewsCategory,
     },
     {
-      title: 'Toyota reports record quarterly profit',
-      titleJa: 'トヨタ自動車、四半期決算で過去最高益を更新',
-      link: '#',
-      pubDate: now,
-      category: 'earnings',
-      source: 'サンプル',
+      title: 'CPI inflation data higher than expected',
+      titleJa: 'CPI、予想を上回るインフレ - 株価急落',
+      category: 'economic' as NewsCategory,
     },
     {
-      title: 'Middle East tensions impact oil prices',
-      titleJa: '中東情勢の緊張、原油価格に影響',
-      link: '#',
-      pubDate: now,
-      category: 'geopolitical',
-      source: 'サンプル',
+      title: 'New sanctions announced against Russia',
+      titleJa: '対ロシア新制裁を発表 - エネルギー市場に影響',
+      category: 'geopolitical' as NewsCategory,
     },
     {
-      title: 'Consumer Price Index rises for second month',
-      titleJa: '消費者物価指数、2ヶ月連続で上昇',
-      link: '#',
-      pubDate: now,
-      category: 'economic',
-      source: 'サンプル',
+      title: 'NVIDIA reports record quarterly earnings',
+      titleJa: 'NVIDIA決算、過去最高益を更新 - AI需要が牽引',
+      category: 'earnings' as NewsCategory,
     },
     {
-      title: 'Apple announces new AI features',
-      titleJa: 'Apple、新しいAI機能を発表',
-      link: '#',
-      pubDate: now,
-      category: 'earnings',
-      source: 'サンプル',
+      title: 'Toyota announces upward revision of profit forecast',
+      titleJa: 'トヨタ、業績見通しを上方修正 - 円安が追い風',
+      category: 'earnings' as NewsCategory,
     },
     {
-      title: 'NVIDIA stock reaches all-time high',
-      titleJa: 'NVIDIA株、過去最高値を更新',
-      link: '#',
-      pubDate: now,
-      category: 'earnings',
-      source: 'サンプル',
+      title: 'Stock market crash fears as volatility surges',
+      titleJa: '株式市場、暴落懸念で急落 - ボラティリティ急上昇',
+      category: 'economic' as NewsCategory,
     },
   ];
+
+  return sampleData.map((item) => {
+    const impact = calculateImpact(item.title + ' ' + item.titleJa);
+    return {
+      title: item.title,
+      titleJa: item.titleJa,
+      link: '#',
+      pubDate: now,
+      category: item.category,
+      source: 'サンプル',
+      impactScore: impact.score,
+      impactLevel: impact.level,
+      impactReason: impact.reason,
+    };
+  });
 }
 
 /**

@@ -125,6 +125,31 @@ body {
   margin-bottom: 1rem;
 }
 
+/* 影響度凡例 */
+.impact-legend {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  margin: 0 0.1rem;
+}
+
+.impact-legend.critical {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+}
+
+.impact-legend.high {
+  background: #f97316;
+  color: white;
+}
+
+.impact-legend.medium {
+  background: #eab308;
+  color: #1e293b;
+}
+
 /* ニュースセクション */
 .news-filters {
   display: flex;
@@ -179,13 +204,61 @@ body {
   color: inherit;
 }
 
+.news-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .news-category {
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  margin-bottom: 0.5rem;
+}
+
+/* 影響度バッジ */
+.news-impact {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.news-impact.impact-critical {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+.news-impact.impact-high {
+  background: #f97316;
+  color: white;
+}
+
+.news-impact.impact-medium {
+  background: #eab308;
+  color: #1e293b;
+}
+
+.news-impact.impact-low {
+  background: #94a3b8;
+  color: white;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.news-impact-reason {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
 }
 
 .news-category.central-bank {

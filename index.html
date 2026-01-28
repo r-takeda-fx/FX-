@@ -43,7 +43,10 @@
 
       <!-- ニュースセクション -->
       <section class="section news-section">
-        <h2>📰 マーケットニュース</h2>
+        <h2>📰 株価に影響するニュース</h2>
+        <p class="section-description">
+          📊 株価への影響度で厳選。<span class="impact-legend critical">最重要</span> <span class="impact-legend high">重要</span> <span class="impact-legend medium">注目</span> の順に表示。
+        </p>
         <div class="news-filters">
           <button class="filter-btn active" data-category="all">すべて</button>
           <button class="filter-btn" data-category="central-bank">中央銀行</button>
@@ -52,7 +55,7 @@
           <button class="filter-btn" data-category="earnings">決算</button>
         </div>
         <div id="news-container" class="news-container">
-          <div class="loading">ニュースを読み込み中...</div>
+          <div class="loading">ニュースを読み込み中... 影響度を分析しています...</div>
         </div>
       </section>
 
