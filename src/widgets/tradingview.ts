@@ -2,25 +2,6 @@
 // TradingView ウィジェット
 // ========================================
 
-declare const TradingView: any;
-
-// ウィジェット設定
-const WIDGET_CONFIG = {
-  autosize: true,
-  symbol: '',
-  interval: 'D',
-  timezone: 'Asia/Tokyo',
-  theme: 'light',
-  style: '1',
-  locale: 'ja',
-  toolbar_bg: '#f1f3f6',
-  enable_publishing: false,
-  hide_top_toolbar: true,
-  hide_legend: false,
-  save_image: false,
-  container_id: '',
-};
-
 // チャート設定
 const CHARTS = [
   { containerId: 'chart-nikkei', symbol: 'TVC:NI225', name: '日経平均' },
@@ -81,31 +62,33 @@ function initTicker(): void {
 }
 
 /**
- * チャートウィジェットを初期化
+ * チャートウィジェットを初期化（ミニチャートウィジェット使用）
  */
 function initChart(containerId: string, symbol: string): void {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // TradingViewウィジェットが読み込まれているか確認
-  if (typeof TradingView === 'undefined') {
-    console.warn('TradingView is not loaded yet');
-    // フォールバック: iframeで埋め込み
-    container.innerHTML = `
-      <iframe
-        src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_widget&symbol=${encodeURIComponent(symbol)}&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&theme=light&style=1&timezone=Asia%2FTokyo&locale=ja"
-        style="width: 100%; height: 100%; border: none;"
-        allowtransparency="true"
-        frameborder="0"
-      ></iframe>
-    `;
-    return;
-  }
+  // ミニチャートウィジェットを使用
+  container.innerHTML = `
+    <div class="tradingview-widget-container" style="height: 100%; width: 100%;">
+      <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
+    </div>
+  `;
 
-  // TradingViewウィジェットを作成
-  new TradingView.widget({
-    ...WIDGET_CONFIG,
+  const script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+  script.async = true;
+  script.innerHTML = JSON.stringify({
     symbol: symbol,
-    container_id: containerId,
+    width: '100%',
+    height: '100%',
+    locale: 'ja',
+    dateRange: '1M',
+    colorTheme: 'light',
+    isTransparent: false,
+    autosize: true,
+    largeChartUrl: '',
   });
+
+  container.querySelector('.tradingview-widget-container')?.appendChild(script);
 }
